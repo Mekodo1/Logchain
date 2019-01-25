@@ -20,7 +20,7 @@ class Blockchain:
 		self.avg_block_time		= 60.0
 		self.min_block_time		= 53.0
 		self.max_block_time		= 67.0
-		self.balance			= int(1000000000 / 0.5) # Anzahl der Teilnehmer im Netzwerk
+		self.balance			= int(1000000000 / 4) # Anzahl der Teilnehmer im Netzwerk
 		self.base_target_gamma	= 64
 		self.min_base_target	= 138350580
 		self.init_base_target	= 153722867
