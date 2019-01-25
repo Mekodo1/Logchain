@@ -7,7 +7,12 @@ import _thread
 from argparse import ArgumentParser
 import nacl.utils
 from nacl.public import PrivateKey, Box
-import pymysql
+
+# schreiben, dass ich nacl mit pip installiert hab
+'''
+recv bytes größer
+
+'''
 
 class Blockchain:
 	def __init__(self, ip=None, port=9999, node_ip=None, node_port=None):
@@ -30,9 +35,7 @@ class Blockchain:
 		self.nodes				= []
 		self.logdata			= []
 		self.queue_logdata		= []
-		self.logfile			= "example.txt"
-
-		self.con = pymysql.connect('localhost', 'nextclouduser', '', 'nextcloud')
+		self.logfile			= "/var/www/html/data/audit.log"
 
 		self.prv_key			= PrivateKey.generate()
 		self.pub_key			= self.prv_key.public_key.encode(encoder = nacl.encoding.HexEncoder).decode()
@@ -162,25 +165,19 @@ class Blockchain:
 
 	def get_log_content(self):
 		while 1:
-			with self.con:
-				cur = self.con.cursor()
-				cur.execute("SELECT * FROM oc_activity")
-
-				rows = cur.fetchall()
-				new_log = False
-
-				for row in rows:
-					in_blockchain = False
-					for block in self.fullchain:
-						if [self.ip,row] in block['data']:
-							in_blockchain = True
-							break
-					if in_blockchain == False and [self.ip,list(row)] not in self.logdata and [self.ip,list(row)] not in self.queue_logdata:
-						self.logdata.append([self.ip,list(row)])
-						new_log = True
-				if new_log == True:
-					self.send_msg("logs")
-				time.sleep(10)
+			f = open(self.logfile,"r")
+			lines = f.readlines()
+			f.close()
+			f = open(self.logfile,"w")
+			f.close()
+			new_log = False
+			for line in lines:
+				if line not in self.logdata:
+					self.logdata.append([self.ip,line])
+					new_log = True
+			if new_log == True:
+				self.send_msg("logs")
+			time.sleep(10)
 
 	def data_lookup(self):
 		for log in self.logdata:
@@ -317,11 +314,11 @@ class Blockchain:
 		self.fullchain.append(blockdata)
 
 	def print_chain(self):
-		#show_keys = ['index','prev_hash','timestamp','base_target','data']
+		show_keys = ['index','prev_hash','timestamp','base_target']
 		for block in self.fullchain:
 			for key in block:
-				#if key in show_keys:
-				print(key + ": " + str(block[key]))
+				if key in show_keys:
+					print(key + ": " + str(block[key]))
 		print("")
 
 if __name__ == '__main__':
