@@ -32,7 +32,7 @@ class Blockchain:
 		self.queue_logdata		= []
 		self.logfile			= "example.txt"
 
-		self.con = pymysql.connect('localhost', 'root', 'qwertz', 'myblog')
+		self.con = pymysql.connect('localhost', 'root', '', 'nextcloud')
 
 		self.prv_key			= PrivateKey.generate()
 		self.pub_key			= self.prv_key.public_key.encode(encoder = nacl.encoding.HexEncoder).decode()
@@ -164,7 +164,7 @@ class Blockchain:
 		while 1:
 			with self.con:
 				cur = self.con.cursor()
-				cur.execute("SELECT * FROM beitraege")
+				cur.execute("SELECT * FROM oc_activity")
 
 				rows = cur.fetchall()
 				new_log = False
