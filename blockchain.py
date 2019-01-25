@@ -84,7 +84,7 @@ class Blockchain:
 			clientsocket.send("success".encode('ascii'))
 
 		while True:
-			msg = clientsocket.recv(1024)
+			msg = clientsocket.recv(4294967296)
 			if not msg:
 				break
 			msg = json.loads(msg.decode('ascii'))
@@ -123,12 +123,12 @@ class Blockchain:
 				if msg.decode('ascii') == "success":
 					if cmd == "blockchain":
 						clientsocket.send(json.dumps(["blockchain"]).encode('ascii'))
-						msg = clientsocket.recv(102400)
+						msg = clientsocket.recv(4294967296)
 						msg = json.loads(msg.decode('ascii'))
 						temp.append(msg[1])
 					elif cmd == "nodes":
 						clientsocket.send(json.dumps(["nodes"]).encode('ascii'))
-						msg = clientsocket.recv(1024)
+						msg = clientsocket.recv(4294967296)
 						msg = json.loads(msg.decode('ascii'))
 						temp.append(msg[1])
 					elif cmd == "new_block":
