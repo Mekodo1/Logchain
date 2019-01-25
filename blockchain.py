@@ -7,12 +7,7 @@ import _thread
 from argparse import ArgumentParser
 import nacl.utils
 from nacl.public import PrivateKey, Box
-
-# schreiben, dass ich nacl mit pip installiert hab
-'''
-recv bytes größer
-
-'''
+import pymysql
 
 class Blockchain:
 	def __init__(self, ip=None, port=9999, node_ip=None, node_port=None):
@@ -25,7 +20,7 @@ class Blockchain:
 		self.avg_block_time		= 60.0
 		self.min_block_time		= 53.0
 		self.max_block_time		= 67.0
-		self.balance			= int(1000000000 / 4) # Anzahl der Teilnehmer im Netzwerk
+		self.balance			= int(1000000000 / 0.5) # Anzahl der Teilnehmer im Netzwerk
 		self.base_target_gamma	= 64
 		self.min_base_target	= 138350580
 		self.init_base_target	= 153722867
@@ -36,6 +31,8 @@ class Blockchain:
 		self.logdata			= []
 		self.queue_logdata		= []
 		self.logfile			= "example.txt"
+
+		self.con = pymysql.connect('localhost', 'root', 'qwertz', 'myblog')
 
 		self.prv_key			= PrivateKey.generate()
 		self.pub_key			= self.prv_key.public_key.encode(encoder = nacl.encoding.HexEncoder).decode()
@@ -165,19 +162,39 @@ class Blockchain:
 
 	def get_log_content(self):
 		while 1:
-			f = open(self.logfile,"r")
-			lines = f.readlines()
-			f.close()
-			f = open(self.logfile,"w")
-			f.close()
-			new_log = False
-			for line in lines:
-				if line not in self.logdata:
-					self.logdata.append([self.ip,line])
-					new_log = True
-			if new_log == True:
-				self.send_msg("logs")
-			time.sleep(10)
+			with self.con:
+				cur = self.con.cursor()
+				cur.execute("SELECT * FROM beitraege")
+
+				rows = cur.fetchall()
+				new_log = False
+
+				for row in rows:
+					in_blockchain = False
+					for block in self.fullchain:
+						if [self.ip,row] in block['data']:
+							in_blockchain = True
+							break
+					if in_blockchain == False and [self.ip,list(row)] not in self.logdata:
+						self.logdata.append([self.ip,list(row)])
+						new_log = True
+				if new_log == True:
+					self.send_msg("logs")
+				time.sleep(10)
+		# while 1:
+		# 	f = open(self.logfile,"r")
+		# 	lines = f.readlines()
+		# 	f.close()
+		# 	f = open(self.logfile,"w")
+		# 	f.close()
+		# 	new_log = False
+		# 	for line in lines:
+		# 		if line not in self.logdata:
+		# 			self.logdata.append([self.ip,line])
+		# 			new_log = True
+		# 	if new_log == True:
+		# 		self.send_msg("logs")
+		# 	time.sleep(10)
 
 	def data_lookup(self):
 		for log in self.logdata:
@@ -203,6 +220,12 @@ class Blockchain:
 				self.logdata.append(self.queue_logdata[i])
 				del self.queue_logdata[i]
 				send_logs = True
+
+		print("Logdata:")
+		print(self.logdata)
+		print("Queue:")
+		print(self.queue_logdata)
+		print("")
 
 		if send_logs:
 			self.send_msg("logs")
