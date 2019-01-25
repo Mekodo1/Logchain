@@ -8,11 +8,6 @@ from argparse import ArgumentParser
 import nacl.utils
 from nacl.public import PrivateKey, Box
 
-# schreiben, dass ich nacl mit pip installiert hab
-'''
-recv bytes größer
-
-'''
 
 class Blockchain:
 	def __init__(self, ip=None, port=9999, node_ip=None, node_port=None):
@@ -172,6 +167,7 @@ class Blockchain:
 			f.close()
 			new_log = False
 			for line in lines:
+				line = json.loads(line)
 				if line not in self.logdata:
 					self.logdata.append([self.ip,line])
 					new_log = True
@@ -218,8 +214,6 @@ class Blockchain:
 			i = len(self.fullchain)
 
 		avg_time = int((time - self.fullchain[len(self.fullchain) - i]['timestamp']) / i)
-		print("avg_time:" + str(avg_time))
-		print("avg_time (ges):" + str((self.fullchain[len(self.fullchain) - 1]['timestamp'] - self.fullchain[0]['timestamp']) / len(self.fullchain)))
 		if avg_time > self.avg_block_time:
 			base_target = self.fullchain[i - 1]['base_target'] * min(avg_time,self.max_block_time) / self.avg_block_time
 		else:
@@ -317,8 +311,9 @@ class Blockchain:
 		show_keys = ['index','prev_hash','timestamp','base_target']
 		for block in self.fullchain:
 			for key in block:
-				if key in show_keys:
-					print(key + ": " + str(block[key]))
+				#if key in show_keys:
+				print(key + ":\t" + str(block[key]))
+			print("")
 		print("")
 
 if __name__ == '__main__':
