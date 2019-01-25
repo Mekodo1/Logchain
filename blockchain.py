@@ -175,26 +175,12 @@ class Blockchain:
 						if [self.ip,row] in block['data']:
 							in_blockchain = True
 							break
-					if in_blockchain == False and [self.ip,list(row)] not in self.logdata:
+					if in_blockchain == False and [self.ip,list(row)] not in self.logdata and [self.ip,list(row)] not in self.queue_logdata:
 						self.logdata.append([self.ip,list(row)])
 						new_log = True
 				if new_log == True:
 					self.send_msg("logs")
 				time.sleep(10)
-		# while 1:
-		# 	f = open(self.logfile,"r")
-		# 	lines = f.readlines()
-		# 	f.close()
-		# 	f = open(self.logfile,"w")
-		# 	f.close()
-		# 	new_log = False
-		# 	for line in lines:
-		# 		if line not in self.logdata:
-		# 			self.logdata.append([self.ip,line])
-		# 			new_log = True
-		# 	if new_log == True:
-		# 		self.send_msg("logs")
-		# 	time.sleep(10)
 
 	def data_lookup(self):
 		for log in self.logdata:
@@ -220,12 +206,6 @@ class Blockchain:
 				self.logdata.append(self.queue_logdata[i])
 				del self.queue_logdata[i]
 				send_logs = True
-
-		print("Logdata:")
-		print(self.logdata)
-		print("Queue:")
-		print(self.queue_logdata)
-		print("")
 
 		if send_logs:
 			self.send_msg("logs")
@@ -337,11 +317,11 @@ class Blockchain:
 		self.fullchain.append(blockdata)
 
 	def print_chain(self):
-		show_keys = ['index','prev_hash','timestamp','base_target']
+		#show_keys = ['index','prev_hash','timestamp','base_target','data']
 		for block in self.fullchain:
 			for key in block:
-				if key in show_keys:
-					print(key + ": " + str(block[key]))
+				#if key in show_keys:
+				print(key + ": " + str(block[key]))
 		print("")
 
 if __name__ == '__main__':
