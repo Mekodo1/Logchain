@@ -30,8 +30,8 @@ class Blockchain:
 		self.nodes				= []
 		self.logdata			= []
 		self.queue_logdata		= []
-		#self.logfile			= "/var/www/html/data/audit.log"
-		self.logfile			= "example.txt"
+		self.logfile			= "/var/www/html/data/audit.log"
+		#self.logfile			= "example.txt"
 
 		self.prv_key			= PrivateKey.generate()
 		self.pub_key			= self.prv_key.public_key.encode(encoder = nacl.encoding.HexEncoder).decode()
