@@ -32,7 +32,7 @@ class Blockchain:
 		self.queue_logdata		= []
 		self.logfile			= "example.txt"
 
-		self.con = pymysql.connect('localhost', 'root', '', 'nextcloud')
+		self.con = pymysql.connect('localhost', 'nextclouduser', '', 'nextcloud')
 
 		self.prv_key			= PrivateKey.generate()
 		self.pub_key			= self.prv_key.public_key.encode(encoder = nacl.encoding.HexEncoder).decode()
