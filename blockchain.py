@@ -31,7 +31,6 @@ class Blockchain:
 		self.logdata			= []
 		self.queue_logdata		= []
 		self.logfile			= "/var/www/html/data/audit.log"
-		#self.logfile			= "example.txt"
 
 		self.prv_key			= PrivateKey.generate()
 		self.pub_key			= self.prv_key.public_key.encode(encoder = nacl.encoding.HexEncoder).decode()
@@ -169,9 +168,11 @@ class Blockchain:
 			new_log = False
 			for line in lines:
 				line = json.loads(line)
-				print(line['reqId'])
+				arr = []
+				for key, value in line.items():
+					arr.append(value)
 				if line not in self.logdata:
-					self.logdata.append([self.ip,line])
+					self.logdata.append([self.ip,arr])
 					new_log = True
 			if new_log == True:
 				self.send_msg("logs")
