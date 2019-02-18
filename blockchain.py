@@ -349,7 +349,12 @@ class Blockchain:
     show_keys = ['index','prev_hash','timestamp','base_target']
     for block in self.fullchain:
       for key in block:
-        print(key + ":\t" + str(block[key]))
+        if key == "data":
+          print("data:")
+          for log in block[key]:
+            print(log)
+        else:
+          print(key + ":\t" + str(block[key]))
       print("")
     print("")
 
