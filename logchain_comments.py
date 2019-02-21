@@ -190,7 +190,7 @@ class Blockchain:
         print("Sent message \""+cmd+"\" to "+node[0] + ":" + str(node[1]))
         clientsocket.close()
 
-    # read received blockchains or nodes and check them for validity
+    # read received blockchains  and check them for validity
     if cmd == "blockchain":
       if temp:
         for chain in temp:
@@ -198,6 +198,7 @@ class Blockchain:
             print("Got a new Blockchain!")
             self.fullchain = chain
 
+    # read received nodes and integrate them into the known nodes
     if cmd == "nodes":
       for temp_nodes in temp:
         for temp_node in temp_nodes:
@@ -280,6 +281,7 @@ class Blockchain:
     else:
       base_target = self.fullchain[i - 1]['base_target'] - (self.fullchain[i - 1]['base_target'] * self.base_target_gamma * (self.avg_block_time - max(avg_time,self.min_block_time)) / self.avg_block_time / 100)
 
+    # limit the base target value
     if base_target < 0 or base_target > self.max_base_target:
       base_target = self.max_base_target
     if base_target < self.min_base_target:
@@ -299,6 +301,7 @@ class Blockchain:
 
   def get_account_hit(self, pub_key, index):
     if len(self.fullchain) > 0:
+      # convert the first 8 byte of the signed generation signature to an integer
       signature = self.hash(self.fullchain[index]['gen_sig'] + pub_key)
       return int(signature[:16], 16)
     else:
@@ -315,6 +318,7 @@ class Blockchain:
     return temp
 
   def mine(self):
+    # check if the current account hit is lower than the target value and the permission to forge a block is given
     self.account_hit = self.get_account_hit(self.pub_key,len(self.fullchain) - 1)
     if self.target(int(time.time())) > self.account_hit:
       self.append_block()
@@ -352,6 +356,7 @@ class Blockchain:
     return False
 
   def append_block(self):
+    # set the structure of each block and the default values for the genesis block
     blockdata = {
       'index' : len(self.fullchain),
       'prev_hash': '0',
@@ -371,6 +376,7 @@ class Blockchain:
     self.fullchain.append(blockdata)
 
   def print_chain(self):
+    # print the whole blockchain into console
     show_keys = ['index','prev_hash','timestamp','base_target']
     for block in self.fullchain:
       for key in block:
